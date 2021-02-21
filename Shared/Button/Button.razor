@@ -1,0 +1,28 @@
+@if (Type == "Button") {
+     <button class="button" @onclick="onClick">
+        @ChildContent
+    </button>
+}
+
+@if (Type == "Anchor") {
+    <a class="button anchor" href="@href">
+        @ChildContent
+    </a>
+}
+
+
+@code {
+    
+    [Parameter]
+    public string Type { get; set; } = "Button";
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> onClick { get; set; }
+
+    [Parameter]
+    public string href { get; set; }
+
+}

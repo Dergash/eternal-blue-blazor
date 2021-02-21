@@ -1,0 +1,46 @@
+
+@using eb_code_challenge_blazor.Shared.Card
+@using eb_code_challenge_blazor.Shared.Button
+@using eb_code_challenge_blazor.Shared.Input
+
+<Card>
+    @ChildContent
+    <div class="controls">
+        <Input OnChange=@((e) => { password = e; }) label="Password" />
+
+        @if (incorrect) {
+            <span class="error">
+                Incorrect password
+            </span>
+        }
+
+        <Button type="Button" onClick="handleClick">
+            Sign in
+        </Button>
+    </div>
+</Card>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public Func<string, Task<bool>> Predicate { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSuccess { get; set; }
+
+    private string password;
+
+    private bool incorrect = false;
+
+    private async void handleClick() {
+        bool result = await Predicate.Invoke(password);
+        if (result) {
+            incorrect = false;
+            await OnSuccess.InvokeAsync(password);
+        } else {
+            incorrect = true;
+        }
+    }
+}

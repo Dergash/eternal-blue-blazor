@@ -1,0 +1,59 @@
+@page "/"
+@using eb_code_challenge_blazor.Shared.Stage
+@using eb_code_challenge_blazor.Shared.Card
+@using eb_code_challenge_blazor.Shared.Button
+
+<div class="container">
+    @if (stage == 1) {
+        <Stage Predicate=@((userInput) => firstPasswordCheck(userInput)) OnSuccess=@(() => { stage = 2; })>
+            <h1 class="header">Welcome to EternalBlue</h1>
+            <p class="details">Please login with the correct password</p>
+            <input class="none" value="98 108 117 101 98 49 117 101 66 108 117 101" />
+        </Stage>
+    }
+    @if (stage == 2) {
+        <Stage Predicate=@((userInput) => secondPasswordCheck(userInput)) OnSuccess=@(() => { stage = stage + 1; })>
+            <h1 class="header">Two step authentication</h1>
+            <p class="congrats">Congrats, you got it!</p>
+            Let's try another one, the answer is inside:
+            <img src="BlueHint.jpg" class="img" />
+            Please insert the second password:
+        </Stage>
+    }
+    @if (stage == 3) {
+        <Card>
+            <h1 class="header">404 Page Not Found</h1>
+            <p>Wow well done, you broke the EternalBlue website. But you made it through the pre-qualification!</p>
+            <p>Now just a small code challange and we are done :)</p>
+            <Button type="Anchor" href="https://app.ifs.aero/EternalBlue/Task.md">
+                Sign in
+            </Button>
+        </Card>
+    }
+    <a href="https://github.com/dergash" class="footer">
+        https://github.com/dergash
+    </a>
+</div>
+
+@code {
+    private int stage = 1;
+
+    private string absolutelyUnremarkableStringMoveAlongCitizenNothingToSeeHere = "98 108 117 101 98 49 117 101 66 108 117 101";
+
+    public async Task<bool> firstPasswordCheck(string userInput) {
+        string expected = String.Join("", absolutelyUnremarkableStringMoveAlongCitizenNothingToSeeHere
+        .Split(" ")
+        .Select((string charCode, int index) => {
+            short code = Int16.Parse(charCode);
+            return Char.ConvertFromUtf32(code);
+        }));
+        return await Task.FromResult(userInput == expected);
+    }
+
+    public async Task<bool> secondPasswordCheck(string userInput) {
+        string image = await System.IO.File.ReadAllTextAsync("wwwroot\\BlueHint.jpg");
+        string keyPhrase = "You found it. The pass is:";
+        string expected = image.Substring(image.IndexOf(keyPhrase) + keyPhrase.Length + 1, 13);
+        return expected == userInput;
+    }
+}
